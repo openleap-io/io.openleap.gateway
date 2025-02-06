@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesMapper;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -24,11 +25,13 @@ import java.util.Map;
 public class Config {
     private final OAuth2ClientProperties clientProperties;
     private final ClientRegistrationProperties clientRegistrationProperties;
+    private final EurekaInstanceConfigBean eurekaInstanceConfigBean;
     String[] allowedServices = {"/catalogs/**", "/actuator/**"};
 
-    public Config(OAuth2ClientProperties clientProperties, ClientRegistrationProperties clientRegistrationProperties) {
+    public Config(OAuth2ClientProperties clientProperties, ClientRegistrationProperties clientRegistrationProperties, EurekaInstanceConfigBean eurekaInstanceConfigBean) {
         this.clientProperties = clientProperties;
         this.clientRegistrationProperties = clientRegistrationProperties;
+        this.eurekaInstanceConfigBean = eurekaInstanceConfigBean;
     }
 
     @Bean
@@ -52,7 +55,7 @@ public class Config {
     @Bean
     ReactiveClientRegistrationRepository dynamicClientRegistrationRepository() {
         var registrationDetails = new DynamicClientRegistrationRepository.ClientRegistrationDetails(
-                clientRegistrationProperties.getInstanceId(),
+                eurekaInstanceConfigBean.getInstanceId(),
                 clientRegistrationProperties.getRegistrationEndpoint(),
                 clientRegistrationProperties.getRegistrationUsername(),
                 clientRegistrationProperties.getRegistrationPassword(),

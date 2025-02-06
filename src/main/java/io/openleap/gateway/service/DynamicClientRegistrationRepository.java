@@ -61,7 +61,7 @@ public class DynamicClientRegistrationRepository implements ReactiveClientRegist
                 "grant_types", List.of(staticRegistration.getAuthorizationGrantType()),
                 "scope", String.join(" ", staticRegistration.getScopes()),
                 "redirect_uris", List.of(resolveCallbackUri(staticRegistration)),
-                "instance_id", clientRegistrationDetails.instanceId(),
+                "instance_id", clientRegistrationDetails.instanceId,
                 "registration_id", registrationId
         );
 

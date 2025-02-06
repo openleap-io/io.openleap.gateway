@@ -7,7 +7,6 @@ import java.util.List;
 
 @ConfigurationProperties(prefix = "oleap.client.registration")
 public final class ClientRegistrationProperties {
-    String instanceId;
     URI registrationEndpoint;
     String registrationUsername;
     String registrationPassword;
@@ -24,14 +23,6 @@ public final class ClientRegistrationProperties {
 
     public void setUnregistrationEndpoint(String unregistrationEndpoint) {
         this.unregistrationEndpoint = unregistrationEndpoint;
-    }
-
-    public String getInstanceId() {
-        return instanceId;
-    }
-
-    public void setInstanceId(String instanceId) {
-        this.instanceId = instanceId;
     }
 
     public String getBaseUrl() {
