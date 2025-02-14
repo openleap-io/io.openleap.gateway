@@ -26,7 +26,7 @@ public class Config {
     private final OAuth2ClientProperties clientProperties;
     private final ClientRegistrationProperties clientRegistrationProperties;
     private final EurekaInstanceConfigBean eurekaInstanceConfigBean;
-    String[] allowedServices = {"/catalogs/**", "/actuator/**"};
+    String[] allowedServices = {"/identity/**", "/actuator/**"};
 
     public Config(OAuth2ClientProperties clientProperties, ClientRegistrationProperties clientRegistrationProperties, EurekaInstanceConfigBean eurekaInstanceConfigBean) {
         this.clientProperties = clientProperties;
