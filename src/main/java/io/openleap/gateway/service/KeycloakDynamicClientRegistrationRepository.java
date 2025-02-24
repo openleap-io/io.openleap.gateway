@@ -18,14 +18,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class DynamicClientRegistrationRepository implements ReactiveClientRegistrationRepository, Iterable<ClientRegistration> {
-    Logger logger = LoggerFactory.getLogger(DynamicClientRegistrationRepository.class);
+public class KeycloakDynamicClientRegistrationRepository implements ReactiveClientRegistrationRepository, Iterable<ClientRegistration> {
+    Logger logger = LoggerFactory.getLogger(KeycloakDynamicClientRegistrationRepository.class);
 
     private final ClientRegistrationDetails clientRegistrationDetails;
     private final Map<String, ClientRegistration> staticClients;
     private final Map<String, ClientRegistration> registrations = new HashMap<>();
 
-    public DynamicClientRegistrationRepository(ClientRegistrationDetails clientRegistrationDetails, Map<String, ClientRegistration> staticClients) {
+    public KeycloakDynamicClientRegistrationRepository(ClientRegistrationDetails clientRegistrationDetails, Map<String, ClientRegistration> staticClients) {
         this.clientRegistrationDetails = clientRegistrationDetails;
         this.staticClients = staticClients;
     }
@@ -55,16 +55,22 @@ public class DynamicClientRegistrationRepository implements ReactiveClientRegist
 
         var staticRegistration = staticClients.get(registrationId);
         Assert.notNull(staticRegistration, "Invalid registrationId: " + registrationId);
-
-        var body = Map.of(
-                "client_name", staticRegistration.getClientName(),
-                "grant_types", List.of(staticRegistration.getAuthorizationGrantType()),
-                "scope", String.join(" ", staticRegistration.getScopes()),
-                "redirect_uris", List.of(resolveCallbackUri(staticRegistration)),
-                "instance_id", clientRegistrationDetails.instanceId,
-                "registration_id", registrationId
-        );
-
+        record RegistrationRequest(String client_name, List<String> redirect_uris, String scope,
+                                   List<String> grant_types) {
+        }
+        record RegistrationRequestDefault(String name, List<String> redirectUris, List<String> defaultClientScopes,
+                                   Map<String,String> attributes) {
+        }
+//        var openIdConnectBody = new RegistrationRequest(
+//                staticRegistration.getClientName(),
+//                List.of(resolveCallbackUri(staticRegistration)),
+//                String.join(" ", staticRegistration.getScopes()),
+//                List.of(staticRegistration.getAuthorizationGrantType().getValue()));
+        var bodyDefault = new RegistrationRequestDefault(
+                staticRegistration.getClientName(),
+                List.of(resolveCallbackUri(staticRegistration)),
+                staticRegistration.getScopes().stream().toList(),
+                Map.of("instanceId", clientRegistrationDetails.instanceId()));
         var objectNodeMono = oauth2Client
                 .post()
                 .uri(clientRegistrationDetails.registrationEndpoint())
@@ -72,7 +78,7 @@ public class DynamicClientRegistrationRepository implements ReactiveClientRegist
                     httpHeaders.setBearerAuth(token);
                     httpHeaders.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .body(Mono.just(body), Map.class)
+                .body(Mono.just(bodyDefault), RegistrationRequestDefault.class)
                 .retrieve()
                 .bodyToMono(ObjectNode.class)
                 .block();
@@ -98,8 +104,8 @@ public class DynamicClientRegistrationRepository implements ReactiveClientRegist
 
     private Mono<ClientRegistration> createClientRegistration(ClientRegistration staticRegistration, ObjectNode body) {
         return Mono.just(ClientRegistration.withClientRegistration(staticRegistration)
-                .clientId(body.get("client_id").asText())
-                .clientSecret(body.get("client_secret").asText())
+                .clientId(body.get("id").asText())
+                .clientSecret(body.get("secret").asText())
                 .build());
     }
 
