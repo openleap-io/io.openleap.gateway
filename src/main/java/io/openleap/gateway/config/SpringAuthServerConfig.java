@@ -20,7 +20,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 
 import java.util.Map;
 
-@Profile({"spring", "spring-uat"})
+@Profile({"spring"})
 @Configuration
 @EnableConfigurationProperties({ClientRegistrationProperties.class, OAuth2ClientProperties.class})
 @EnableWebFluxSecurity

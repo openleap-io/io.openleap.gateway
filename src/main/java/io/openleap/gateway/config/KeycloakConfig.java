@@ -20,7 +20,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 
 import java.util.Map;
 
-@Profile({"keycloak","keycloak-uat"})
+@Profile({"keycloak"})
 @Configuration
 @EnableConfigurationProperties({ClientRegistrationProperties.class, OAuth2ClientProperties.class})
 @EnableWebFluxSecurity
