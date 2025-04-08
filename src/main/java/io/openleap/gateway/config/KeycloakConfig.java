@@ -28,7 +28,7 @@ public class KeycloakConfig {
     private final OAuth2ClientProperties clientProperties;
     private final ClientRegistrationProperties clientRegistrationProperties;
     private final EurekaInstanceConfigBean eurekaInstanceConfigBean;
-    String[] allowedServices = {"/identity/**", "/actuator/**", "/api/**"};
+    String[] allowedServices = {"/identity/**", "/actuator/**", "/ga/**"};
 
     public KeycloakConfig(OAuth2ClientProperties clientProperties, ClientRegistrationProperties clientRegistrationProperties, EurekaInstanceConfigBean eurekaInstanceConfigBean) {
         this.clientProperties = clientProperties;
