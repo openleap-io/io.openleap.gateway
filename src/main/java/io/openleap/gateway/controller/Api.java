@@ -25,6 +25,9 @@ public class Api {
         return Mono.just(oidcUser);
     }
 
-
+    @GetMapping(value = "/health")
+    public Boolean health() {
+        return Boolean.TRUE;
+    }
 }
 
