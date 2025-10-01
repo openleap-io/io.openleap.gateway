@@ -53,6 +53,7 @@ public class KeycloakConfig {
     }
 
     @Bean
+    @Profile("client-registration.enabled")
     ReactiveClientRegistrationRepository keycloakDynamicClientRegistrationRepository() {
         var registrationDetails = new KeycloakDynamicClientRegistrationRepository.ClientRegistrationDetails(
                 eurekaInstanceConfigBean.getInstanceId(),
