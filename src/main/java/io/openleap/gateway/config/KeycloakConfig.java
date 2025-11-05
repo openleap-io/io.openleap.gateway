@@ -2,6 +2,7 @@ package io.openleap.gateway.config;
 
 import io.openleap.gateway.service.KeycloakDynamicClientRegistrationRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesMapper;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -53,7 +54,7 @@ public class KeycloakConfig {
     }
 
     @Bean
-    @Profile("client-registration.enabled")
+    @ConditionalOnBooleanProperty("client-registration.enabled")
     ReactiveClientRegistrationRepository keycloakDynamicClientRegistrationRepository() {
         var registrationDetails = new KeycloakDynamicClientRegistrationRepository.ClientRegistrationDetails(
                 eurekaInstanceConfigBean.getInstanceId(),
