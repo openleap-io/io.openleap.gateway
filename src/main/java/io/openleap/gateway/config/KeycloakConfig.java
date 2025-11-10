@@ -17,27 +17,36 @@ import org.springframework.security.oauth2.client.registration.ReactiveClientReg
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoders;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import java.util.Map;
 
 @Profile({"keycloak"})
 @Configuration
-@EnableConfigurationProperties({ClientRegistrationProperties.class, OAuth2ClientProperties.class})
+@EnableConfigurationProperties({ClientRegistrationProperties.class, OAuth2ClientProperties.class, CorsProperties.class})
 @EnableWebFluxSecurity
 public class KeycloakConfig {
     private final OAuth2ClientProperties clientProperties;
     private final ClientRegistrationProperties clientRegistrationProperties;
+    private final CorsProperties corsProperties;
     private final EurekaInstanceConfigBean eurekaInstanceConfigBean;
     String[] allowedServices = {"/identity/**", "/actuator/**", "/ga/**", "/api/health/**"};
 
-    public KeycloakConfig(OAuth2ClientProperties clientProperties, ClientRegistrationProperties clientRegistrationProperties, EurekaInstanceConfigBean eurekaInstanceConfigBean) {
+    public KeycloakConfig(OAuth2ClientProperties clientProperties,
+                          ClientRegistrationProperties clientRegistrationProperties,
+                          CorsProperties corsProperties,
+                          EurekaInstanceConfigBean eurekaInstanceConfigBean) {
         this.clientProperties = clientProperties;
         this.clientRegistrationProperties = clientRegistrationProperties;
+        this.corsProperties = corsProperties;
         this.eurekaInstanceConfigBean = eurekaInstanceConfigBean;
     }
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         http.authorizeExchange(auth ->
                         auth.pathMatchers(allowedServices).permitAll()
                                 .anyExchange().authenticated())
@@ -45,6 +54,20 @@ public class KeycloakConfig {
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()));
         http.csrf(ServerHttpSecurity.CsrfSpec::disable);
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(corsProperties.getAllowedOrigins());
+        configuration.setAllowedMethods(corsProperties.getAllowedMethods());
+        configuration.setAllowedHeaders(corsProperties.getAllowedHeaders());
+        configuration.setAllowCredentials(corsProperties.getAllowCredentials());
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean
