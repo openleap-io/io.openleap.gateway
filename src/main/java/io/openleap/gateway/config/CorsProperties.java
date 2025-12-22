@@ -10,6 +10,7 @@ public final class CorsProperties {
     private List<String> allowedMethods;
     private List<String> allowedHeaders;
     private Boolean allowCredentials;
+    private List<String> exposedHeaders;
 
     public List<String> getAllowedOrigins() {
         return allowedOrigins;
@@ -41,6 +42,14 @@ public final class CorsProperties {
 
     public void setAllowCredentials(Boolean allowCredentials) {
         this.allowCredentials = allowCredentials;
+    }
+
+    public List<String> getExposedHeaders() {
+        return exposedHeaders;
+    }
+
+    public void setExposedHeaders(List<String> exposedHeaders) {
+        this.exposedHeaders = exposedHeaders;
     }
 }
 

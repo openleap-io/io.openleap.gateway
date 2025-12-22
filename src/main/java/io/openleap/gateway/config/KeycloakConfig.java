@@ -64,6 +64,7 @@ public class KeycloakConfig {
         configuration.setAllowedMethods(corsProperties.getAllowedMethods());
         configuration.setAllowedHeaders(corsProperties.getAllowedHeaders());
         configuration.setAllowCredentials(corsProperties.getAllowCredentials());
+        configuration.setExposedHeaders(corsProperties.getExposedHeaders());
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
