@@ -22,3 +22,10 @@ spring:
 eureka:
   client:
     enabled: off
+gateway:
+  security:
+    allowed-services:
+      - /identity/**
+      - /actuator/**
+      - /ga/**
+      - /api/health/**
