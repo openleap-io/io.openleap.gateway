@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="run" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="keycloak" />
+    <envs>
+      <env name="client-registration.enabled" value="false" />
+    </envs>
+    <module name="io.openleap.gateway" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="io.openleap.gateway.ApiGatewayRunner" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
