@@ -33,18 +33,15 @@ public class KeycloakConfig {
     private final ClientRegistrationProperties clientRegistrationProperties;
     private final CorsProperties corsProperties;
     private final SecurityProperties securityProperties;
-    private final EurekaInstanceConfigBean eurekaInstanceConfigBean;
 
     public KeycloakConfig(OAuth2ClientProperties clientProperties,
                           ClientRegistrationProperties clientRegistrationProperties,
                           CorsProperties corsProperties,
-                          SecurityProperties securityProperties,
-                          EurekaInstanceConfigBean eurekaInstanceConfigBean) {
+                          SecurityProperties securityProperties) {
         this.clientProperties = clientProperties;
         this.clientRegistrationProperties = clientRegistrationProperties;
         this.corsProperties = corsProperties;
         this.securityProperties = securityProperties;
-        this.eurekaInstanceConfigBean = eurekaInstanceConfigBean;
     }
 
     @Bean
@@ -81,7 +78,7 @@ public class KeycloakConfig {
 
     @Bean
     @ConditionalOnBooleanProperty("client-registration.enabled")
-    ReactiveClientRegistrationRepository keycloakDynamicClientRegistrationRepository() {
+    ReactiveClientRegistrationRepository keycloakDynamicClientRegistrationRepository(EurekaInstanceConfigBean eurekaInstanceConfigBean) {
         var registrationDetails = new KeycloakDynamicClientRegistrationRepository.ClientRegistrationDetails(
                 eurekaInstanceConfigBean.getInstanceId(),
                 clientRegistrationProperties.getRegistrationEndpoint(),
