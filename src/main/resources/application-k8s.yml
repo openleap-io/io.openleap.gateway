@@ -2,8 +2,26 @@ server:
   port: 8080
 
 spring:
+  cloud:
+    config:
+      enabled: false
   config:
     import: "optional:file:/config/application-routes.yml"
+  security:
+    oauth2:
+      client:
+        provider:
+          openleap:
+            issuer-uri: ${KEYCLOAK_ISSUER_URI}
+            jwk-set-uri: ${KEYCLOAK_JWK_SET_URI}
+            token-uri: ${KEYCLOAK_TOKEN_URI}
+
+eureka:
+  client:
+    enabled: false
+
+client-registration:
+  enabled: false
 
 management:
   endpoints:
