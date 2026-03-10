@@ -16,6 +16,11 @@ spring:
             jwk-set-uri: ${KEYCLOAK_JWK_SET_URI}
             token-uri: ${KEYCLOAK_TOKEN_URI}
 
+gateway:
+  security:
+    allowed-services:
+      - /actuator/**
+
 eureka:
   client:
     enabled: false
