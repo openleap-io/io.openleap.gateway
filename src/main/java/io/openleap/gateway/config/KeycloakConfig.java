@@ -23,6 +23,7 @@ import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Profile({"keycloak"})
 @Configuration
@@ -45,13 +46,14 @@ public class KeycloakConfig {
     }
 
     @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http,
+                                                            Optional<ReactiveClientRegistrationRepository> clientRegistrationRepository) {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         http.authorizeExchange(auth ->
-                        auth.pathMatchers(securityProperties.getAllowedServices().toArray(String[]::new)).permitAll()
-                                .anyExchange().authenticated())
-                .oauth2Login(Customizer.withDefaults())
+                auth.pathMatchers(securityProperties.getAllowedServices().toArray(String[]::new)).permitAll()
+                        .anyExchange().authenticated())
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()));
+        clientRegistrationRepository.ifPresent(repo -> http.oauth2Login(Customizer.withDefaults()));
         http.csrf(ServerHttpSecurity.CsrfSpec::disable);
         return http.build();
     }
