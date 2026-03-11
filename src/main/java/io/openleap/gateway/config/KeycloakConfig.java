@@ -10,20 +10,23 @@ import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoders;
+import org.springframework.security.oauth2.server.resource.authentication.JwtIssuerReactiveAuthenticationManagerResolver;
+import org.springframework.security.oauth2.server.resource.authentication.JwtReactiveAuthenticationManager;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Profile({"keycloak"})
 @Configuration
@@ -45,15 +48,32 @@ public class KeycloakConfig {
         this.securityProperties = securityProperties;
     }
 
+    @Value("${keycloak.server-url}")
+    private String keycloakBaseUrl;
+
+    @Bean
+    public JwtIssuerReactiveAuthenticationManagerResolver authenticationManagerResolver() {
+        Map<String, ReactiveAuthenticationManager> managers = new ConcurrentHashMap<>();
+        return new JwtIssuerReactiveAuthenticationManagerResolver(issuer -> {
+            if (!issuer.startsWith(keycloakBaseUrl + "/realms/")) {
+                return Mono.error(new IllegalArgumentException("Untrusted issuer: " + issuer));
+            }
+            ReactiveAuthenticationManager manager = managers.computeIfAbsent(issuer,
+                    i -> new JwtReactiveAuthenticationManager(ReactiveJwtDecoders.fromIssuerLocation(i)));
+            return Mono.just(manager);
+        });
+    }
+
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http,
+                                                            JwtIssuerReactiveAuthenticationManagerResolver authenticationManagerResolver,
                                                             Optional<ReactiveClientRegistrationRepository> clientRegistrationRepository) {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         http.authorizeExchange(auth ->
                 auth.pathMatchers(securityProperties.getAllowedServices().toArray(String[]::new)).permitAll()
                         .anyExchange().authenticated())
-                .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()));
-        clientRegistrationRepository.ifPresent(repo -> http.oauth2Login(Customizer.withDefaults()));
+                .oauth2ResourceServer(oauth2 -> oauth2.authenticationManagerResolver(authenticationManagerResolver));
+        clientRegistrationRepository.ifPresent(repo -> http.oauth2Login(oauth2 -> {}));
         http.csrf(ServerHttpSecurity.CsrfSpec::disable);
         return http.build();
     }
@@ -71,11 +91,6 @@ public class KeycloakConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-    }
-
-    @Bean
-    public ReactiveJwtDecoder jwtDecoder(@Value("${spring.security.oauth2.client.provider.openleap.issuer-uri}") String issuerUri) {
-        return ReactiveJwtDecoders.fromIssuerLocation(issuerUri);
     }
 
     @Bean

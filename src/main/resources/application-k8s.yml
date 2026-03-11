@@ -16,6 +16,9 @@ spring:
             jwk-set-uri: ${KEYCLOAK_JWK_SET_URI}
             token-uri: ${KEYCLOAK_TOKEN_URI}
 
+keycloak:
+  server-url: ${KEYCLOAK_SERVER_URL}
+
 gateway:
   security:
     allowed-services:
