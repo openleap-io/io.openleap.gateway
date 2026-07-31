@@ -1,0 +1,37 @@
+name: Release
+
+# Cuts a release: release commit (pom without -SNAPSHOT) -> annotated tag ->
+# next-SNAPSHOT commit -> atomic push of main + tag.
+#
+# The tag push then triggers the build workflow, which derives the release
+# version from the tag name and deploys to nexus-releases; the main push
+# deploys the new -SNAPSHOT to nexus-snapshots.
+#
+# Leave both inputs blank for the common case: releases the current pom version
+# with -SNAPSHOT stripped, then continues on patch+1. Set release-version to cut
+# a minor or major instead.
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-version:
+        description: 'Release version, e.g. 1.2.3. Blank = strip -SNAPSHOT from the current pom.'
+        type: string
+        default: ''
+      next-version:
+        description: 'Next development version, e.g. 1.2.4-SNAPSHOT. Blank = release version with patch+1.'
+        type: string
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    uses: openleap-io/io.openleap.ops.workflows/.github/workflows/maven-release.yml@v1
+    with:
+      release-version: ${{ inputs.release-version }}
+      next-version: ${{ inputs.next-version }}
+    secrets:
+      NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}

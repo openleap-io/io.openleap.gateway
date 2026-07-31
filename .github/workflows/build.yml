@@ -1,0 +1,30 @@
+name: Build and Deploy
+
+# Default-Branch dieses Repos ist master, nicht main.
+on:
+  push:
+    branches: [master]
+    tags: ['v*']
+  pull_request:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+  deployments: write
+  security-events: write
+
+jobs:
+  build:
+    uses: openleap-io/io.openleap.ops.workflows/.github/workflows/maven-build.yml@v1
+    with:
+      docker: true
+      image: io.openleap.gateway
+    secrets:
+      NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}

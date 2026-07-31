@@ -4,13 +4,19 @@
     <parent>
         <groupId>io.openleap</groupId>
         <artifactId>io.openleap.parent</artifactId>
-        <version>52</version>
+        <version>3.1.4</version>
         <relativePath />
     </parent>
     <artifactId>io.openleap.gateway</artifactId>
     <version>1.1.8-SNAPSHOT</version>
     <name>OpenLeap.io: Gateway</name>
     <description>An API Gateway that serves as a central entry point into the whole microservice network</description>
+
+    <properties>
+        <!-- Bis Parent 52 kam diese Version aus dem Parent. io.openleap.parent
+             3.1.4 ist BOM-only und verwaltet keine Dritt-Bibliotheken mehr. -->
+        <jolokia-core.version>1.7.2</jolokia-core.version>
+    </properties>
 
     <developers>
         <developer>
@@ -167,10 +173,6 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>io.interface21</groupId>
-            <artifactId>ameba-lib</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.projectreactor.netty</groupId>
             <artifactId>reactor-netty</artifactId>
             <scope>compile</scope>
@@ -183,81 +185,12 @@
         <dependency>
             <groupId>org.jolokia</groupId>
             <artifactId>jolokia-core</artifactId>
+            <version>${jolokia-core.version}</version>
             <scope>runtime</scope>
         </dependency>
     </dependencies>
 
 
-    <repositories>
-        <repository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Snapshot Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>Staging Repository</name>
-            <url>https://oss.sonatype.org/content/groups/staging/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>spring-snapshots</id>
-            <name>Spring Snapshots</name>
-            <url>https://repo.spring.io/snapshot</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </pluginRepository>
-        <pluginRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Snapshot Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
 
     <profiles>
         <profile>
