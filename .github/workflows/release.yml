@@ -35,3 +35,6 @@ jobs:
     secrets:
       NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
       NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+      # Pflicht: mit dem Standard-GITHUB_TOKEN gepushte Tags loesen keinen
+      # Build aus, der Release bliebe folgenlos. Guard in maven-release.yml.
+      RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
