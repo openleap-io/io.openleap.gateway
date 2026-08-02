@@ -1,0 +1,59 @@
+# Dependabot — weekly dependency updates for Maven and GitHub Actions.
+version: 2
+
+registries:
+  # The 3.x parent line and all io.openleap.* artifacts live ONLY here.
+  # Without this block Dependabot sees just Maven Central, where the
+  # abandoned integer-versioned parents (42..52) still sit — that is what
+  # produced the bogus "bump io.openleap.parent from 3.1.2 to 52" PRs.
+  # Credentials come from the Dependabot secret store, which is separate
+  # from the Actions secret store: Settings > Secrets > Dependabot.
+  nexus:
+    type: maven-repository
+    url: https://nexus.openleap.cloud/repository/maven-public/
+    username: ${{secrets.NEXUS_USERNAME}}
+    password: ${{secrets.NEXUS_PASSWORD}}
+
+updates:
+  # Maven dependencies for the multi-module reactor (rooted at the repo root pom).
+  - package-ecosystem: maven
+    directory: '/'
+    registries:
+      - nexus
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:00'
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+      - maven
+    commit-message:
+      prefix: build
+    ignore:
+      # Maven orders "52" above "3.1.4", and those old parents are still
+      # published on Maven Central. Without this, every parent bump PR
+      # would propose the dead integer line. Revisit if a real 4.x ships.
+      - dependency-name: 'io.openleap:io.openleap.parent'
+        versions: ['>=4.0.0']
+    groups:
+      # One PR per week for routine drift; security updates are ungrouped
+      # and still arrive individually and immediately.
+      routine:
+        update-types:
+          - minor
+          - patch
+
+  # GitHub Actions used by the workflows in .github/workflows.
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:00'
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+      - github-actions
+    commit-message:
+      prefix: ci

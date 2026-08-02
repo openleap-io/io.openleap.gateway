@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false" scan="true" scanPeriod="30 seconds">
 
-    <conversionRule conversionWord="tid" converterClass="org.ameba.logging.ThreadIdProvider" />
-
     <variable scope="context" name="mdcPattern" value="%replace(;%X{MSGKEY};%X{MSGDATA}){';+( |$)', ''}" />
 
     <property name="LOG_TEMP" value="/tmp/oleap" />
@@ -16,8 +14,6 @@
 
     <logger name="com.github.dozermapper" level="ERROR" />
     <logger name="com.netflix.discovery" level="OFF"/>
-    <logger name="org.ameba" level="WARN"/>
-    <logger name="org.ameba.oauth2" level="DEBUG"/>
     <logger name="org.hibernate.boot.internal.InFlightMetadataCollectorImpl" level="ERROR"/>
     <logger name="org.hibernate.SQL" level="OFF" />
     <logger name="org.hibernate.SQL_SLOW" level="OFF"/>
